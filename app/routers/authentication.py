@@ -6,7 +6,9 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
 
+from app.csrf import generate_csrf_token
 from app.db.role.schema import Role
 from app.db.user import model as user_model
 from app.db.role import model as role_model
@@ -56,7 +58,7 @@ class TokenData(BaseModel):
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 def verify_password(plain_password, hashed_password):
@@ -91,6 +93,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
+@router.get('/current-user',response_model=User)
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -98,14 +101,16 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        print("Token: ",token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("Payload: ", payload)
         username: str = payload.get("sub")
+        print("Username: ", username)
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(db, username=token_data.username)
+    user = get_user(db, username=username)
     if user is None:
         raise credentials_exception
     return user
@@ -125,7 +130,6 @@ async def login(
         db: Session = Depends(get_db)
 ):
     user = authenticate_user(db, form_data.username, form_data.password)
-    print(user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -136,11 +140,15 @@ async def login(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return Token(
+    token = Token(
         access_token=access_token,
         token_type="bearer",
         user=User.from_orm(user)
     )
+    response = JSONResponse(content=token.dict())
+    csrf_token = generate_csrf_token()
+    response.set_cookie(key="X-CSRF-Token", value=csrf_token, httponly=True, secure=True)
+    return response
 
 
 @router.post("/signup", response_model=Token)
