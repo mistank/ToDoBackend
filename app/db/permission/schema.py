@@ -1,10 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 
 
-class RoleBase(BaseModel):
+class PermissionBase(BaseModel):
     id: int
     name: str
-class Role(RoleBase):
+class Permission(PermissionBase):
     class Config:
         from_attributes = True # orm mode
         arbitrary_types_allowed = True

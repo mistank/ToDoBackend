@@ -30,12 +30,13 @@ async def csrf_protect(request: Request, call_next, exclude=None):
         exclude = []
     if request.url.path not in exclude:
         if request.method in ("POST", "PUT", "DELETE"):
-            print(request.headers)
-            csrf_token = request.headers.get("cookie").split("X-CSRF-Token=")[1]
+            print("Request headers: ", request.headers)
+            csrf_token = request.headers.get("set-cookie","").split("X-CSRF-TOKEN=")[0]
             print("CSRF: " + csrf_token)
             if not csrf_token or not verify_csrf_token(csrf_token):
                 raise HTTPException(status_code=403, detail="Invalid CSRF token")
 
     response = await call_next(request)
-    response.set_cookie(key="X-CSRF-Token", value=generate_csrf_token(), httponly=True, secure=True)
+    if "X-CSRF-Token" not in response.headers.get("set-cookie",""):
+        response.set_cookie(key="X-CSRF-Token", value=generate_csrf_token(), httponly=True, samesite="Strict")
     return response

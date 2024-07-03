@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
-from app.db.role.model import Role
+from app.db.permission.model import Permission
 
 class User(Base):
     __tablename__ = "user"
@@ -14,9 +14,10 @@ class User(Base):
     email = Column(String(100), unique=True, index=True)
     hashed_password = Column(String(128))
     is_active = Column(Boolean, default=True)
-    role_id = Column(Integer, ForeignKey('role.id'))
+    permission_id = Column(Integer, ForeignKey('permission.id'))
 
-    role = relationship("Role",back_populates="user")
+    project = relationship("Project",back_populates="user")
+    permission = relationship("Permission",back_populates="user")
 
     def __repr__(self):
-        return f"<User(username={self.username}, email={self.email}), role={self.role.name}>"
+        return f"<User(username={self.username}, email={self.email}), permission={self.permission.name}>"

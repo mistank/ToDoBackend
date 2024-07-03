@@ -9,9 +9,9 @@ from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 
 from app.csrf import generate_csrf_token
-from app.db.role.schema import Role
+from app.db.permission.schema import Permission
 from app.db.user import model as user_model
-from app.db.role import model as role_model
+from app.db.permission import model as role_model
 from app.db.database import SessionLocal, engine
 import jwt
 
@@ -140,15 +140,11 @@ async def login(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    token = Token(
+    return Token(
         access_token=access_token,
         token_type="bearer",
         user=User.from_orm(user)
     )
-    response = JSONResponse(content=token.dict())
-    csrf_token = generate_csrf_token()
-    response.set_cookie(key="X-CSRF-Token", value=csrf_token, httponly=True, secure=True)
-    return response
 
 
 @router.post("/signup", response_model=Token)
@@ -172,3 +168,4 @@ async def signup(
         data={"sub": new_user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
+
