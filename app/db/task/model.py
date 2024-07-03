@@ -12,5 +12,7 @@ class Task(Base):
     description = Column(String(100))
     deadline = Column(String(50))
     project = Column(Integer, ForeignKey('project.id'), nullable=False, index=True)
+    taskCategory = Column(Integer, ForeignKey('taskCategory.id'), nullable=False, index=True)
 
     project_rel = relationship("Project",back_populates="task")
+    taskCategory_rel = relationship("TaskCategory",back_populates="task")

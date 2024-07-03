@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from app.db.taskCategory.schema import TaskCategory
 
 class TaskBase(BaseModel):
     name: str
@@ -7,9 +8,7 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     deadline: str
     project: int
-
-
-
+    taskCategory: int
 
 class Task(TaskBase):
     class Config:

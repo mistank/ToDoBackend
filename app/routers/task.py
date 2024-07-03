@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.database import engine, SessionLocal
 from app.db.task import model, crud, schema
+from app.db.taskCategory import model as taskCat_model
 
 model.Base.metadata.create_all(bind=engine)
+taskCat_model.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
