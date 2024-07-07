@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.db.database import engine, SessionLocal
 from app.db.projectStatus.model import ProjectStatus
 from app.db.status import schema, crud
+from app.db.projectStatus import crud as projectStatus_crud
 from app.db.status.schema import Status
 from app.db.task.model import Task
 from app.db.projectStatus import model as projectStatus_model
@@ -20,9 +21,15 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/status/")
-def create_status(status: schema.StatusBase, db: Session = Depends(get_db)):
-    return crud.create_status(db=db, status=status)
+@router.post("/status/{project_id}")
+def create_status(status: schema.StatusBase, project_id: int, db: Session = Depends(get_db)):
+    db_status = crud.get_status_by_name(db, status.name)
+    if not db_status:
+        print("Status not found, creating new one")
+        db_status = crud.create_status(db=db, status=status)
+    projectStatus_crud.create_projectStatus(db, project_id, db_status)
+    print("Status: ", db_status)
+    return db_status
 
 @router.get("/statuses_from_project/{project_id}",response_model=List[schema.Status])
 def read_statuses_from_project(project_id: int, db: Session = Depends(get_db)):
@@ -56,3 +63,7 @@ def delete_status(status_id: int, db: Session = Depends(get_db)):
     db_status = crud.delete_status(db, status_id=status_id)
     return db_status
 
+@router.delete("/delete_project_status/{project_id}")
+def delete_project_status(status:schema.Status, project_id: int, db: Session = Depends(get_db)):
+    db_status = projectStatus_crud.delete_projectStatus(db, project_id, status.id)
+    return db_status

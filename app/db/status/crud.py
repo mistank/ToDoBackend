@@ -31,3 +31,5 @@ def delete_status(db, status_id):
     return db_status
 
 
+def get_status_by_name(db, name):
+    return db.query(model.Status).filter(model.Status.name == name).first()
