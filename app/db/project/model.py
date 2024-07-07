@@ -15,5 +15,6 @@ class Project(Base):
 
     user = relationship("User",back_populates="project")
     task = relationship("Task",back_populates="project")
+    projectStatus = relationship("ProjectStatus",back_populates="project")
     def __repr__(self):
         return f"<Project(name={self.name}, owner={self.owner}), description={self.description}, creation_date={self.creation_date}, deadline={self.deadline}>"

@@ -1,12 +1,17 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.db.database import engine, SessionLocal
+from app.db.projectStatus.model import ProjectStatus
 from app.db.status import schema, crud
-from app.db.status.model import Status
+from app.db.status.schema import Status
 from app.db.task.model import Task
+from app.db.projectStatus import model as projectStatus_model
 
 router = APIRouter()
 
+projectStatus_model.Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
@@ -19,16 +24,13 @@ def get_db():
 def create_status(status: schema.StatusBase, db: Session = Depends(get_db)):
     return crud.create_status(db=db, status=status)
 
-@router.get("/statuses_from_project/{project_id}")
+@router.get("/statuses_from_project/{project_id}",response_model=List[schema.Status])
 def read_statuses_from_project(project_id: int, db: Session = Depends(get_db)):
-    # Pretpostavka da Task model ima kolonu project_id za povezivanje sa projektom
-    tasks = db.query(Task).filter(Task.project == project_id).all()
-    status_ids = {task.status for task in tasks}  # Pretpostavka da Task model ima atribut status_id
-    statuses = db.query(Status).filter(Status.id.in_(status_ids)).all()  # Pretpostavka da postoji model Status
-    print("Statuses: ", statuses)
-    if not statuses:
+    projectStatuses = db.query(projectStatus_model.ProjectStatus).filter(projectStatus_model.ProjectStatus.pid == project_id).all()
+    if not projectStatuses:
         raise HTTPException(status_code=404, detail="No statuses found for the given project")
-    return statuses
+    print("Statuses: ", projectStatuses)
+    return [Status.from_orm(projectStatus.status) for projectStatus in projectStatuses]
 
 @router.get("/status/")
 def read_statuses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

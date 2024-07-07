@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.db.database import engine, SessionLocal
+from app.db.status.schema import Status
 from app.db.task import model, crud, schema
 from app.db.task.schema import Task
 from app.db.taskCategory import model as taskCat_model
@@ -47,8 +48,8 @@ def read_task(task_id: int, db: Session = Depends(get_db)):
 #     ).filter(model.Task.project == project_id).all()
 #     if not tasks:
 #         raise HTTPException(status_code=404, detail="No tasks found for the given project")
-#     print("Tasks: ", tasks)
-#     return tasks
+#     print("Tasks: ", tasks)#     return tasks
+
 
 @router.get("/tasks_from_project/{project_id}", response_model=List[schema.Task])
 def read_tasks_from_project(project_id: int, db: Session = Depends(get_db)):
@@ -68,6 +69,13 @@ def read_tasks_with_status(status_id: int, db: Session = Depends(get_db)):
 @router.put("/tasks/{task_id}")
 def update_task(task_id: int, task: schema.TaskBase, db: Session = Depends(get_db)):
     db_task = crud.update_task(db, task=task, task_id=task_id)
+    return db_task
+
+@router.patch("/change_task_status/{task_id}")
+def update_task_status(task_id: int, status: Status, db: Session = Depends(get_db)):
+    print("Task ID: ", task_id)
+    print("Status ID: ", status.id)
+    db_task = crud.update_task_status(db, task_id=task_id, status_id=status.id)
     return db_task
 
 @router.delete("/tasks/{task_id}")
