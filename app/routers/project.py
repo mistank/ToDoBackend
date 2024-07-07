@@ -47,6 +47,17 @@ def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     projects = crud.get_projects(db, skip=skip, limit=limit)
     return projects
 
+@router.get("/projects/owned/", response_model=list[schema.Project])
+async def read_owned_projects(db: Session = Depends(get_db),
+                                token: str = Depends(oauth2_scheme)):
+    # Extract the current user from the token
+    current_user = await get_current_user(token, db)
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    # Get the projects owned by the current user
+    projects = crud.get_owned_projects(db, owner_id=current_user.id)
+    return projects
+
 @router.get("/projects/{project_id}", response_model=schema.Project)
 def read_project(project_id: int, db: Session = Depends(get_db)):
     db_project = crud.get_project(db, project_id=project_id)

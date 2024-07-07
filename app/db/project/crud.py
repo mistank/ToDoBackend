@@ -9,6 +9,8 @@ def get_project(db, project_id: int):
 def get_projects(db, skip: int = 0, limit: int = 100):
     return db.query(model.Project).offset(skip).limit(limit).all()
 
+def get_owned_projects(db, owner_id: int):
+    return db.query(model.Project).filter(model.Project.owner == owner_id).all()
 
 
 def create_project(db, project):

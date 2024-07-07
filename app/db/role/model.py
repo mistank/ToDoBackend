@@ -1,10 +1,15 @@
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import relationship
+
 from app.db.database import Base
 
 class Role(Base):
-    id: int
-    name: str
+    __tablename__ = "role"
 
-    class Config:
-        from_attributes = True  # orm mode
-        arbitrary_types_allowed = True
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True, nullable=False)
+
+    projectUserRole = relationship("ProjectUserRole",back_populates="role")
+    def __repr__(self):
+        return f"Role('{self.name}', '{self.name}')"
 

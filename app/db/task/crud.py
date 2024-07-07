@@ -4,8 +4,7 @@ from app.db.task import model, schema
 
 
 def create_task(db: Session, task: schema.TaskCreate):
-    print(task.dict())
-    db_task = model.Task(**task.dict(),status="not started")
+    db_task = model.Task(**task.dict())
     db.add(db_task)
     db.commit()
     db.refresh(db_task)

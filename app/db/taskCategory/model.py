@@ -8,6 +8,6 @@ class TaskCategory(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False)
 
-    task = relationship("Task",back_populates="taskCategory_rel")
+    task = relationship("Task",back_populates="taskCategory")
     def __repr__(self):
         return f"<TaskCategory(name={self.name}, description={self.description})>"

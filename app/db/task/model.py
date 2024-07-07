@@ -8,11 +8,15 @@ class Task(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False)
-    status = Column(String(50), nullable=False)
+    status_id = Column(Integer, ForeignKey('status.id'), nullable=False, index=True)
     description = Column(String(100))
     deadline = Column(String(50))
-    project = Column(Integer, ForeignKey('project.id'), nullable=False, index=True)
-    taskCategory = Column(Integer, ForeignKey('taskCategory.id'), nullable=False, index=True)
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=False, index=True)
+    taskCategory_id = Column(Integer, ForeignKey('taskCategory.id'), nullable=False, index=True)
 
-    project_rel = relationship("Project",back_populates="task")
-    taskCategory_rel = relationship("TaskCategory",back_populates="task")
+    project = relationship("Project",back_populates="task")
+    taskCategory = relationship("TaskCategory",back_populates="task")
+    status = relationship("Status",back_populates="task")
+
+    def __repr__(self):
+        return f"<Task Name: {self.name}> + <Task Description: {self.description}> + <Task Deadline: {self.deadline}> + <Task Project: {self.project}> + <Task Category: {self.taskCategory}> + <Task Status: {self.status}>"
