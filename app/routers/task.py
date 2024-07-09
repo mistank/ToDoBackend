@@ -83,3 +83,4 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db_task = crud.delete_task(db, task_id=task_id)
     return db_task
 
+

@@ -2,13 +2,15 @@ from sqlalchemy.orm import Session
 
 from app.db.task import model, schema
 from app.db.status import model as status_model
+from app.db.task.schema import Task
 
-def create_task(db: Session, task: schema.TaskCreate):
+
+def create_task(db: Session, task: schema.TaskCreate, response_model=schema.Task):
     db_task = model.Task(**task.dict())
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
-    return db_task
+    return Task.from_orm(db_task)
 
 def get_task(db: Session, task_id: int):
     return db.query(model.Task).filter(model.Task.id == task_id).first()
