@@ -12,20 +12,27 @@ def create_task(db: Session, task: schema.TaskCreate, response_model=schema.Task
     db.refresh(db_task)
     return Task.from_orm(db_task)
 
+
 def get_task(db: Session, task_id: int):
     return db.query(model.Task).filter(model.Task.id == task_id).first()
+
 
 def get_tasks(db: Session, skip: int = 0, limit: int = 100):
     return db.query(model.Task).offset(skip).limit(limit).all()
 
-def update_task(db: Session, task: schema.TaskBase, task_id: int):
+
+def update_task(db: Session, task: schema.TaskBase, task_id: int, response_model=schema.Task):
     db_task = db.query(model.Task).filter(model.Task.id == task_id).first()
+    print("Task that is pulled: ", db_task)
+    print("Task that is sent: ", task)
     db_task.name = task.name
     db_task.description = task.description
-    db_task.status = task.status
+    db_task.taskCategory_id = task.taskCategory_id
+    db_task.deadline = task.deadline
     db.commit()
     db.refresh(db_task)
-    return db_task
+    return Task.from_orm(db_task)
+
 
 def delete_task(db, task_id):
     db_task = db.query(model.Task).filter(model.Task.id == task_id).first()

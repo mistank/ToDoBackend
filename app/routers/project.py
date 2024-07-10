@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import Depends, APIRouter, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -29,18 +31,12 @@ async def create_project(project: schema.ProjectBase, db: Session = Depends(get_
     # Modify the project data to include the current user as the owner
     project_data = project.dict()
     project_data['owner'] = current_user.id
-    # Create the project with the current user as the owner
     try:
         # Attempt to create the project with the current user as the owner
         return crud.create_project(db=db, project=schema.ProjectCreate(**project_data))
     except HTTPException as e:
         # If an HTTPException is raised, re-raise it to be handled by FastAPI
         raise HTTPException(status_code=e.status_code, detail=e.detail)
-    except Exception as e:
-        # For any other exceptions, you can return a generic error message
-        # or log the exception for further investigation
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            detail="An error occurred while creating the project.")
 
 @router.get("/projects/", response_model=list[schema.Project])
 def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

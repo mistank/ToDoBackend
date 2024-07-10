@@ -1,6 +1,6 @@
-import datetime
+from datetime import datetime
 from fastapi import HTTPException
-from app.db.project import model
+from app.db.project import model, schema
 from sqlalchemy.exc import IntegrityError
 def get_project(db, project_id: int):
     return db.query(model.Project).filter(model.Project.id == project_id).first()
@@ -16,7 +16,7 @@ def get_owned_projects(db, owner_id: int):
 def create_project(db, project):
     try:
         db_project = model.Project(name=project.name, owner=project.owner, description=project.description,
-                                   creation_date=datetime.date.today().strftime('%d-%m-%Y'), deadline=project.deadline)
+                                   creation_date=datetime.now(), deadline=project.deadline)
         db.add(db_project)
         db.commit()
         db.refresh(db_project)
@@ -31,15 +31,15 @@ def create_project(db, project):
 
 
 
-def update_project(db, project, project_id: int):
+def update_project(db, project:schema.Project, project_id: int):
     db_project = db.query(model.Project).filter(model.Project.id == project_id).first()
     db_project.name = project.name
-    db_project.owner = project.owner
     db_project.description = project.description
     db_project.creation_date = project.creation_date
     db_project.deadline = project.deadline
     db.commit()
     db.refresh(db_project)
+    print(db_project)
     return db_project
 
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 from app.db.user.schema import UserBase
@@ -6,7 +8,7 @@ from app.db.user.schema import UserBase
 class ProjectBase(BaseModel):
     name: str
     description: str
-    deadline: str
+    deadline: datetime
 
 
 

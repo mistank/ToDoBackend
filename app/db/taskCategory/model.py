@@ -10,4 +10,4 @@ class TaskCategory(Base):
 
     task = relationship("Task",back_populates="taskCategory")
     def __repr__(self):
-        return f"<TaskCategory(name={self.name}, description={self.description})>"
+        return f"<TaskCategory(name={self.name})>"
