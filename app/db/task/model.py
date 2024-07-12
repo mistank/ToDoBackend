@@ -7,7 +7,7 @@ class Task(Base):
     __tablename__ = "task"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), unique=True, nullable=False)
+    name = Column(String(50), nullable=False)
     status_id = Column(Integer, ForeignKey('status.id'), nullable=False, index=True)
     description = Column(String(100))
     deadline = Column(DateTime, nullable=False)

@@ -35,7 +35,6 @@ def update_project(db, project:schema.Project, project_id: int):
     db_project = db.query(model.Project).filter(model.Project.id == project_id).first()
     db_project.name = project.name
     db_project.description = project.description
-    db_project.creation_date = project.creation_date
     db_project.deadline = project.deadline
     db.commit()
     db.refresh(db_project)

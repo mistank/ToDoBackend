@@ -12,8 +12,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    permission: Permission
-
 
 class User(UserBase):
     id: int

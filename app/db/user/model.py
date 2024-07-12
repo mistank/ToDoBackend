@@ -16,6 +16,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     permission_id = Column(Integer, ForeignKey('permission.id'))
 
+    reset_token = relationship("ResetToken",back_populates="user")
     project = relationship("Project",back_populates="user")
     permission = relationship("Permission",back_populates="user")
 
