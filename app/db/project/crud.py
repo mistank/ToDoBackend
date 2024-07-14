@@ -2,6 +2,7 @@ from datetime import datetime
 from fastapi import HTTPException
 from app.db.project import model, schema
 from sqlalchemy.exc import IntegrityError
+from app.db.projectUserRole import model as projectUserRole_model
 def get_project(db, project_id: int):
     return db.query(model.Project).filter(model.Project.id == project_id).first()
 
@@ -47,3 +48,8 @@ def delete_project(db, project_id: int):
     db.delete(db_project)
     db.commit()
     return db_project
+
+
+def get_working_projects(db, user_id):
+# get all projects where uid is the logged in user in table projectUserRole
+    return db.query(model.Project).filter(model.Project.id == projectUserRole_model.ProjectUserRole.pid).filter(projectUserRole_model.ProjectUserRole.uid == user_id).all()

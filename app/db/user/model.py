@@ -19,6 +19,8 @@ class User(Base):
     reset_token = relationship("ResetToken",back_populates="user")
     project = relationship("Project",back_populates="user")
     permission = relationship("Permission",back_populates="user")
+    projectUserRole = relationship("ProjectUserRole",back_populates="user")
+    userTask = relationship("UserTask",back_populates="user")
 
     def __repr__(self):
         return f"<User(username={self.username}, email={self.email}), permission={self.permission.name}>"

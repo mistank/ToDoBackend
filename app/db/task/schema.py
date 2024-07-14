@@ -30,6 +30,3 @@ class Task(TaskBase):
         from_attributes = True  # Ispravljeno sa orm_mode na from_attributes
         orm_mode = True  # Ispravljeno sa from_attributes na orm_mode
         arbitrary_types_allowed = True
-        # json_encoders = {
-        #     datetime: lambda v: v.strftime('%d-%m-%Y')
-        # }

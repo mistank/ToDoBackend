@@ -23,3 +23,11 @@ def create_role(db: Session, projectUserRole: schema.ProjectUserRoleBase):
     db.commit()
     db.refresh(db_projectUserRole)
     return db_projectUserRole
+
+
+def add_user_to_project(db, project_id, user_id, role_id):
+    db_projectUserRole = model.ProjectUserRole(uid=user_id, pid=project_id, rid=role_id)
+    db.add(db_projectUserRole)
+    db.commit()
+    db.refresh(db_projectUserRole)
+    return db_projectUserRole
