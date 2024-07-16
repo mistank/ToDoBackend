@@ -313,6 +313,8 @@ async def send_reset_email(email_to: str, token: str):
 
 @router.post("/forgot-password/{email}")
 async def forgot_password(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    email = email_formatter(email)
+    print("Email: ", email)
     user = db.query(user_model.User).filter(user_model.User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -324,7 +326,7 @@ async def forgot_password(email: str, background_tasks: BackgroundTasks, db: Ses
 
 class ResetPasswordRequest(BaseModel):
     token: str = Field(..., example="q_hXNKr1P0IjO-sxxavbmLrYWOU8ToLCWieUA5hY5Qo")
-    new_password: str = Field(..., example="sarenileptir")
+    new_password: str = Field(..., example="polupoljoprivrednik")
 @router.post("/reset-password/")
 async def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
     user = resetToken_crud.verify_reset_token(db, request.token)
@@ -334,3 +336,22 @@ async def reset_password(request: ResetPasswordRequest, db: Session = Depends(ge
     db.commit()
     return {"message": "Password has been reset successfully."}
 
+
+class ChangePasswordRequest(BaseModel):
+    token: str = Field(..., example="q_hXNKr1P0IjO-sxxavbmLrYWOU8ToLCWieUA5hY5Qo")
+    old_password: str = Field(..., example="polupoljoprivrednik")
+    new_password: str = Field(..., example="polupoljoprivrednik")
+@router.post("/change-password/")
+async def change_password(request: ChangePasswordRequest, db: Session = Depends(get_db)):
+
+    reset_token = secrets.token_urlsafe()
+    # Store the reset token with an expiration time
+    await resetToken_crud.store_reset_token(db, user.id, reset_token)
+    user = resetToken_crud.verify_reset_token(db, request.token)
+    if not user:
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
+    if not verify_password(request.old_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Old password is incorrect")
+    user.hashed_password = pwd_context.hash(request.new_password)
+    db.commit()
+    return {"message": "Password has been changed successfully."}

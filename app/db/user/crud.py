@@ -1,7 +1,10 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.db.user import model, schema
 from passlib.context import CryptContext
+from app.db.project import model as project_model
+from app.db.projectUserRole import model as projectUserRole_model
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -48,3 +51,10 @@ def delete_user(db, user_id):
     db.delete(db_user)
     db.commit()
     return db_user
+
+
+def get_users_from_project(db, project_id):
+    users = db.query(projectUserRole_model.ProjectUserRole).options(joinedload(projectUserRole_model.ProjectUserRole.user)).filter(projectUserRole_model.ProjectUserRole.pid == project_id).all()
+    users = [user_role.user for user_role in users]
+    print("Users: ", users)
+    return users

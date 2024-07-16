@@ -21,6 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/openapi.json")
+def get_openapi_spec():
+    return app.openapi()
+
 # Uključivanje rutera
 app.include_router(authentication.router,tags=["authentication"])
 app.include_router(user.router,tags=["user"])

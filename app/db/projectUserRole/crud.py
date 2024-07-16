@@ -31,3 +31,7 @@ def add_user_to_project(db, project_id, user_id, role_id):
     db.commit()
     db.refresh(db_projectUserRole)
     return db_projectUserRole
+
+
+def get_user_project(uid, project_id, db):
+    return db.query(ProjectUserRole).filter(ProjectUserRole.uid == uid, ProjectUserRole.pid == project_id).first()

@@ -17,7 +17,7 @@ class Task(Base):
     project = relationship("Project", back_populates="task")
     taskCategory = relationship("TaskCategory", back_populates="task")
     status = relationship("Status", back_populates="task")
-    userTask = relationship("UserTask", back_populates="task")
+    userTask = relationship("UserTask", back_populates="task", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Task Name: {self.name}> + <Task Description: {self.description}> + <Task Deadline: {self.deadline}> + <Task Project: {self.project}> + <Task Category: {self.taskCategory}> + <Task Status: {self.status}>"
