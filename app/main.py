@@ -31,7 +31,7 @@ app.include_router(user.router,tags=["user"])
 app.include_router(project.router,tags=["project"])
 app.include_router(task.router,tags=["task"])
 app.include_router(status.router,tags=["status"])
-app.include_router(taskCategory.router,tags=["taslCategory"])
+app.include_router(taskCategory.router,tags=["taskCategory"])
 
 
 #zastita od csrf napada kroz generisanje csrf tokena

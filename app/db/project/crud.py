@@ -21,6 +21,10 @@ def create_project(db, project):
         db.add(db_project)
         db.commit()
         db.refresh(db_project)
+        db_projectUserRole = projectUserRole_model.ProjectUserRole(uid=project.owner, pid=db_project.id, rid=1)
+        db.add(db_projectUserRole)
+        db.commit()
+        db.refresh(db_projectUserRole)
         return db_project
     except IntegrityError as e:
         db.rollback()
@@ -53,3 +57,14 @@ def delete_project(db, project_id: int):
 def get_working_projects(db, user_id):
 # get all projects where uid is the logged in user in table projectUserRole
     return db.query(model.Project).filter(model.Project.id == projectUserRole_model.ProjectUserRole.pid).filter(projectUserRole_model.ProjectUserRole.uid == user_id).all()
+
+
+def get_related_projects(db, user_id):
+    #izvlacenje svih projekata koji su vezani sa korisnikom u tabeli projectUserRole
+    return db.query(model.Project).filter(model.Project.id == projectUserRole_model.ProjectUserRole.pid).filter(projectUserRole_model.ProjectUserRole.uid == user_id).all()
+
+
+    # owned_projects = get_owned_projects(db, user_id)
+    # working_projects = get_working_projects(db, user_id)
+    # projects = owned_projects + working_projects
+    # return projects
