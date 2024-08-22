@@ -54,7 +54,32 @@ def delete_user(db, user_id):
 
 
 def get_users_from_project(db, project_id):
-    users = db.query(projectUserRole_model.ProjectUserRole).options(joinedload(projectUserRole_model.ProjectUserRole.user)).filter(projectUserRole_model.ProjectUserRole.pid == project_id).all()
-    users = [user_role.user for user_role in users]
-    print("Users: ", users)
-    return users
+    user_roles = db.query(projectUserRole_model.ProjectUserRole).options(
+        joinedload(projectUserRole_model.ProjectUserRole.user),
+        joinedload(projectUserRole_model.ProjectUserRole.role)
+    ).filter(projectUserRole_model.ProjectUserRole.pid == project_id).all()
+
+    result = [
+        {
+            'id': user_role.user.id,
+            'firstName': user_role.user.firstName,
+            'lastName': user_role.user.lastName,
+            'username': user_role.user.username,
+            'email': user_role.user.email,
+            'role_name': user_role.role.name
+        }
+        for user_role in user_roles
+    ]
+
+    return result
+
+
+def get_users_not_from_project(db, project_id):
+    #project-user-role -> pur
+    purs = db.query(projectUserRole_model.ProjectUserRole).options(
+        joinedload(projectUserRole_model.ProjectUserRole.user),
+    ).filter(projectUserRole_model.ProjectUserRole.pid == project_id).all()
+    users_on_project = [pur.user for pur in purs]
+    all_users = db.query(model.User).all()
+    #return the difference between all users and users on project
+    return [user for user in all_users if user not in [user_on_project for user_on_project in users_on_project]]

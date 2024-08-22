@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 from app.db.permission.schema import Permission
+from app.db.role.schema import Role
 
 
 class UserBase(BaseModel):
@@ -12,6 +13,9 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+class UserRole(UserBase):
+    role: Role
 
 class User(UserBase):
     id: int

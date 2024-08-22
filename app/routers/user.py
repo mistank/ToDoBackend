@@ -55,7 +55,12 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return crud.delete_user(db=db, user_id=user_id)
 
-@router.get("/users/{project_id}/", response_model=list[schema.User])
+@router.get("/users-from-project/{project_id}")
 def get_users_for_project(project_id: int, db: Session = Depends(get_db)):
     users = crud.get_users_from_project(db, project_id)
+    return users
+
+@router.get("/users-not-from-project/{project_id}/", response_model=list[schema.User])
+def get_users_not_from_project(project_id: int, db: Session = Depends(get_db)):
+    users = crud.get_users_not_from_project(db, project_id)
     return users

@@ -45,14 +45,14 @@ async def create_project(project: schema.ProjectBase, db: Session = Depends(get_
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.post("/projects/add_user/", response_model=projectUserRole_schema.ProjectUserRole)
-def add_user_to_project(project_id: int, user_id: int, role_id:int, db: Session = Depends(get_db)):
-    db_project = crud.get_project(db, project_id=project_id)
+def add_user_to_project(pur: projectUserRole_schema.ProjectUserRole, db: Session = Depends(get_db)):
+    db_project = crud.get_project(db, project_id=pur.pid)
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
-    db_user = user_crud.get_user(db, user_id=user_id)
+    db_user = user_crud.get_user(db, user_id=pur.uid)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return projectUserRole_crud.add_user_to_project(db=db, project_id=project_id, user_id=user_id, role_id=role_id)
+    return projectUserRole_crud.add_user_to_project(db=db, project_id=pur.pid, user_id=pur.uid, role_id=pur.rid)
 
 
 @router.get("/projects/", response_model=list[schema.Project])

@@ -2,11 +2,8 @@ from pydantic import BaseModel
 
 
 class RoleBase(BaseModel):
-    id: int
     name: str
 
-class RoleCreate(RoleBase):
-    name: str
 
 class Role(RoleBase):
 

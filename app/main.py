@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.csrf import csrf_protect
 from app.db import permission
-from app.routers import authentication, user, project, task, status, taskCategory
+from app.routers import authentication, user, project, task, status, taskCategory, role
 import uvicorn
 
 app = FastAPI()
@@ -32,7 +32,7 @@ app.include_router(project.router,tags=["project"])
 app.include_router(task.router,tags=["task"])
 app.include_router(status.router,tags=["status"])
 app.include_router(taskCategory.router,tags=["taskCategory"])
-
+app.include_router(role.router,tags=["role"])
 
 #zastita od csrf napada kroz generisanje csrf tokena
 # app.middleware("http")(partial(csrf_protect,exclude =["/login"]))
