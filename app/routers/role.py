@@ -18,6 +18,7 @@ def get_db():
 @router.get("/roles/")
 def read_roles(db: Session = Depends(get_db)):
     roles = db.query(model.Role).all()
+    print(roles)
     return roles
 
 @router.get("/roles/{role_id}")

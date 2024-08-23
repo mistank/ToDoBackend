@@ -35,3 +35,10 @@ def add_user_to_project(db, project_id, user_id, role_id):
 
 def get_user_project(uid, project_id, db):
     return db.query(ProjectUserRole).filter(ProjectUserRole.uid == uid, ProjectUserRole.pid == project_id).first()
+
+
+def remove_user_from_project(db, project_id, user_id):
+    db_projectUserRole = db.query(ProjectUserRole).filter(ProjectUserRole.pid == project_id, ProjectUserRole.uid == user_id).first()
+    db.delete(db_projectUserRole)
+    db.commit()
+    return db_projectUserRole

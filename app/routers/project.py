@@ -121,3 +121,13 @@ def delete_project(project_id: int, db: Session = Depends(get_db)):
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
     return crud.delete_project(db=db, project_id=db_project.id)
+
+@router.delete("/projects/remove_user/", response_model=projectUserRole_schema.ProjectUserRole)
+def remove_user_from_project(pur: projectUserRole_schema.ProjectUserRoleBase, db: Session = Depends(get_db)):
+    db_project = crud.get_project(db, project_id=pur.pid)
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db_user = user_crud.get_user(db, user_id=pur.uid)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return projectUserRole_crud.remove_user_from_project(db=db, project_id=pur.pid, user_id=pur.uid)
