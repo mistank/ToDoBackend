@@ -42,3 +42,11 @@ def remove_user_from_project(db, project_id, user_id):
     db.delete(db_projectUserRole)
     db.commit()
     return db_projectUserRole
+
+
+def update_user_role(db, project_id, user_id, role_id):
+    db_projectUserRole = db.query(ProjectUserRole).filter(ProjectUserRole.pid == project_id, ProjectUserRole.uid == user_id).first()
+    db_projectUserRole.rid = role_id
+    db.commit()
+    db.refresh(db_projectUserRole)
+    return db_projectUserRole

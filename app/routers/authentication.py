@@ -21,7 +21,7 @@ from app.db.resetToken import crud as resetToken_crud
 from app.db.permission.schema import Permission
 from app.db.user import model as user_model
 from app.db.permission import model as role_model
-from app.db.user.schema import User, UserCreate, UserBase
+from app.db.user import schema
 from app.db.user import crud as user_crud
 from app.db.database import SessionLocal, engine
 import jwt
@@ -85,11 +85,11 @@ def get_db():
 class Token(BaseModel):
     access_token: str
     token_type: str
-    user: User
+    user: schema.User
 
 
 class TokenData(BaseModel):
-    user: User
+    user: schema.User
 
 
 # class User(BaseModel):
@@ -149,7 +149,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-@router.get('/current-user', response_model=User)
+@router.get('/current-user', response_model=schema.User)
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -172,7 +172,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
 
 
 async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)],
+        current_user: Annotated[schema.User, Depends(get_current_user)],
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -198,13 +198,13 @@ async def login(
     return Token(
         access_token=access_token,
         token_type="bearer",
-        user=User.from_orm(user)
+        user=schema.User.from_orm(user)
     )
 
 
 @router.post("/signup", response_model=Token)
 async def signup(
-        user_data: UserCreate,
+        user_data: schema.UserCreate,
         db: Session = Depends(get_db)
 ):
     user = user_crud.get_user_by_username(db, user_data.username)
@@ -215,7 +215,7 @@ async def signup(
         )
     hashed_password = get_password_hash(user_data.password)
     email = email_formatter(user_data.email)
-    new_user = user_model.User(username=email, hashed_password=hashed_password, email=user_data.email, permission_id=2, firstName=user_data.firstName, lastName=user_data.lastName, is_active=1)
+    new_user = user_model.User(username=user_data.username, hashed_password=hashed_password, email=user_data.email, permission_id=2, firstName=user_data.firstName, lastName=user_data.lastName, is_active=1)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -223,7 +223,7 @@ async def signup(
     access_token = create_access_token(
         data={"sub": new_user.username}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer", user=User.from_orm(new_user))
+    return Token(access_token=access_token, token_type="bearer", user=schema.User.from_orm(new_user))
 
 @router.post("/google-login/{email}", response_model=Token)
 async def google_login(email: str,
@@ -248,12 +248,12 @@ async def google_login(email: str,
     return Token(
         access_token=access_token,
         token_type="bearer",
-        user=User.from_orm(user)
+        user=schema.User.from_orm(user)
     )
 
 @router.post("/google-signup", response_model=Token)
 async def google_signup(
-        userInfo: UserBase,
+        userInfo: schema.UserBase,
         db: Session = Depends(get_db)
 ):
     user = user_crud.get_user_by_email(db, userInfo.email)
@@ -273,7 +273,7 @@ async def google_signup(
     access_token = create_access_token(
         data={"sub": new_user.username}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer", user=User.from_orm(new_user))
+    return Token(access_token=access_token, token_type="bearer", user=schema.User.from_orm(new_user))
 
 async def send_reset_email(email_to: str, token: str):
     port = 587  # or 465 for SSL
@@ -346,8 +346,9 @@ async def change_password(request: ChangePasswordRequest, db: Session = Depends(
 
     reset_token = secrets.token_urlsafe()
     # Store the reset token with an expiration time
-    await resetToken_crud.store_reset_token(db, user.id, reset_token)
     user = resetToken_crud.verify_reset_token(db, request.token)
+    await resetToken_crud.store_reset_token(db, user.id, reset_token)
+
     if not user:
         raise HTTPException(status_code=404, detail="Invalid or expired token")
     if not verify_password(request.old_password, user.hashed_password):

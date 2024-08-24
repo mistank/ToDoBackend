@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import Depends, APIRouter, HTTPException, status
 from sqlalchemy.orm import Session
@@ -27,19 +28,10 @@ def get_db():
 
 
 @router.post("/projects/", response_model=schema.Project)
-async def create_project(project: schema.ProjectBase, db: Session = Depends(get_db),
-                         token: str = Depends(oauth2_scheme)):
-    # Extract the current user from the token
-    current_user = await get_current_user(token, db)
-    if not current_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    # Modify the project data to include the current user as the owner
-    project_data = project.dict()
-    project_data['owner'] = current_user.id
+def create_project(project: schema.ProjectCreate, db: Session = Depends(get_db)):
     try:
         # Attempt to create the project with the current user as the owner
-        return crud.create_project(db=db, project=schema.ProjectCreate(**project_data))
+        return crud.create_project(db=db, project=project)
     except HTTPException as e:
         # If an HTTPException is raised, re-raise it to be handled by FastAPI
         raise HTTPException(status_code=e.status_code, detail=e.detail)
@@ -114,6 +106,16 @@ def update_project(project_id: int, project: schema.ProjectBase, db: Session = D
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
     return crud.update_project(db=db, project=project, project_id=db_project.id)
+
+@router.patch("/projects/update_user_role/", response_model=projectUserRole_schema.ProjectUserRole)
+def update_user_role(pur: projectUserRole_schema.ProjectUserRole, db: Session = Depends(get_db)):
+    db_project = crud.get_project(db, project_id=pur.pid)
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db_user = user_crud.get_user(db, user_id=pur.uid)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return projectUserRole_crud.update_user_role(db=db, project_id=pur.pid, user_id=pur.uid, role_id=pur.rid)
 
 @router.delete("/projects/{project_id}", response_model=schema.ProjectBase)
 def delete_project(project_id: int, db: Session = Depends(get_db)):

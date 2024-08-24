@@ -9,7 +9,6 @@ class ProjectBase(BaseModel):
     name: str
     description: str
     deadline: datetime
-    owner: int
 
 
 
