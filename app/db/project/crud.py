@@ -3,6 +3,10 @@ from fastapi import HTTPException
 from app.db.project import model, schema
 from sqlalchemy.exc import IntegrityError
 from app.db.projectUserRole import model as projectUserRole_model
+from app.db.user import model as user_model
+from app.db.project import model as project_model
+from sqlalchemy.orm import joinedload
+
 def get_project(db, project_id: int):
     return db.query(model.Project).filter(model.Project.id == project_id).first()
 
@@ -61,8 +65,11 @@ def get_working_projects(db, user_id):
 
 def get_related_projects(db, user_id):
     #izvlacenje svih projekata koji su vezani sa korisnikom u tabeli projectUserRole
-    return db.query(model.Project).filter(model.Project.id == projectUserRole_model.ProjectUserRole.pid).filter(projectUserRole_model.ProjectUserRole.uid == user_id).all()
-
+    return db.query(model.Project) \
+        .join(projectUserRole_model.ProjectUserRole, model.Project.id == projectUserRole_model.ProjectUserRole.pid) \
+        .filter(projectUserRole_model.ProjectUserRole.uid == user_id) \
+        .options(joinedload(model.Project.user)) \
+        .all()
 
     # owned_projects = get_owned_projects(db, user_id)
     # working_projects = get_working_projects(db, user_id)

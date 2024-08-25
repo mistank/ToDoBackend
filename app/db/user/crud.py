@@ -83,3 +83,14 @@ def get_users_not_from_project(db, project_id):
     all_users = db.query(model.User).all()
     #return the difference between all users and users on project
     return [user for user in all_users if user not in [user_on_project for user_on_project in users_on_project]]
+
+
+def create_users(db, users):
+    for user in users:
+        hashed_password = pwd_context.hash(user.password)
+        db_user = model.User(username=user.username, email=user.email, hashed_password=hashed_password,
+                             permission_id=2, firstName=user.firstName, lastName=user.lastName)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+    return users

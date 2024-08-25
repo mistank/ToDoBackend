@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.db.user.schema import UserBase
+from app.db.user.schema import UserBase, User
 
 
 class ProjectBase(BaseModel):
@@ -17,6 +17,7 @@ class ProjectCreate(ProjectBase):
 
 class Project(ProjectBase):
     id : int
+    user: User
 
     class Config:
         from_orm = True
