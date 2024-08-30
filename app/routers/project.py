@@ -100,7 +100,7 @@ def read_project(project_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Project not found")
     return db_project
 
-@router.put("/projects/{project_id}", response_model=schema.ProjectBase)
+@router.put("/projects/{project_id}", response_model=schema.Project)
 def update_project(project_id: int, project: schema.ProjectBase, db: Session = Depends(get_db)):
     db_project = crud.get_project(db, project_id=project_id)
     if db_project is None:
