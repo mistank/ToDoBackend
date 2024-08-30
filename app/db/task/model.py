@@ -13,6 +13,7 @@ class Task(Base):
     deadline = Column(DateTime, nullable=False)
     project_id = Column(Integer, ForeignKey('project.id'), nullable=False, index=True)
     taskCategory_id = Column(Integer, ForeignKey('taskCategory.id'), nullable=False, index=True)
+    priority = Column(String(50), nullable=True)
 
     project = relationship("Project", back_populates="task")
     taskCategory = relationship("TaskCategory", back_populates="task")

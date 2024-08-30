@@ -13,6 +13,7 @@ class TaskBase(BaseModel):
     project_id: int
     taskCategory_id: int
     status_id: int
+    priority: str
 
 class TaskCreate(TaskBase):
     pass
