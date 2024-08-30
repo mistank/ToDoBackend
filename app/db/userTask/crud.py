@@ -11,9 +11,10 @@ def assign_user_task(user_id: int, task_id: int, db: Session):
 
 def get_user_task(user_id: int, task_id: int, db: Session):
     return db.query(UserTask).filter(UserTask.uid == user_id, UserTask.tid == task_id).first()
-def get_user_tasks(user_id: int, db: Session):
-    return db.query(UserTask).filter(UserTask.user_id == user_id).all()
-
+def get_tasks_assigned_to_user(user_id: int,skip: int, limit:int, db: Session):
+    user_tasks = db.query(UserTask).filter(UserTask.uid == user_id).offset(skip).limit(limit).all()
+    tasks = [user_task.task for user_task in user_tasks]
+    return tasks
 
 def get_task_users(task_id: int, db: Session):
     return db.query(UserTask).filter(UserTask.task_id == task_id).all()

@@ -101,6 +101,14 @@ def read_tasks_from_project(project_id: int, db: Session = Depends(get_db)):
     # Konvertovanje ORM objekata u Pydantic modele
     return [Task.from_orm(task) for task in tasks]
 
+#def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),response_model=List[schema.Task]):
+@router.get("/tasks-assigned-to-user/{user_id}",response_model=list[schema.Task])
+def read_tasks_for_user(user_id: int,skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tasks = userTask_crud.get_tasks_assigned_to_user(user_id, skip,limit, db)
+    if not tasks:
+        raise HTTPException(status_code=404, detail="No tasks found for the given user")
+    return tasks
+
 @router.get("/tasks_with_status/{status_id}")
 def read_tasks_with_status(status_id: int, db: Session = Depends(get_db)):
     tasks = db.query(model.Task).filter(model.Task.status == status_id).all()
