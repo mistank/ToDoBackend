@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from sqlalchemy.orm import Session
 
 from app.db.task import model, schema
@@ -7,12 +10,21 @@ from app.db.task.schema import Task
 
 def create_task(db: Session, task: schema.TaskCreate, response_model=schema.Task):
     db_task = model.Task(**task.dict())
+    # print("Task that is sent: ", db_task.deadline)
+    # #db_task.deadline = datetime.fromisoformat(str(db_task.deadline)).replace(tzinfo=pytz.utc).astimezone(pytz.timezone('Europe/Belgrade')).isoformat()
+    # if db_task.deadline:
+    #     local_tz = pytz.timezone('Europe/Belgrade')
+    #     utc_dt = datetime.fromisoformat(str(db_task.deadline)).replace(tzinfo=pytz.utc)
+    #     local_dt = utc_dt.astimezone(local_tz)
+    #     db_task.deadline = local_dt.isoformat()
+    # print("Task that is sent: ", db_task.deadline)
+    # print("Task that is sent: ", db_task)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
     return Task.from_orm(db_task)
 
-
+#datetime.fromisoformat(value).replace(tzinfo=pytz.utc).astimezone(pytz.timezone('Europe/Belgrade')).isoformat()
 def get_task(db: Session, task_id: int):
     return db.query(model.Task).filter(model.Task.id == task_id).first()
 
@@ -29,6 +41,7 @@ def update_task(db: Session, task: schema.TaskBase, task_id: int, response_model
     db_task.description = task.description
     db_task.taskCategory_id = task.taskCategory_id
     db_task.deadline = task.deadline
+    db_task.priority = task.priority
     db.commit()
     db.refresh(db_task)
     return Task.from_orm(db_task)

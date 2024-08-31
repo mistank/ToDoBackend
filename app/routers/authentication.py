@@ -332,6 +332,9 @@ async def reset_password(request: ResetPasswordRequest, db: Session = Depends(ge
     user = resetToken_crud.verify_reset_token(db, request.token)
     if not user:
         raise HTTPException(status_code=404, detail="Invalid or expired token")
+    if old_password := request.old_password:
+        if not verify_password(old_password, user.hashed_password):
+            raise HTTPException(status_code=400, detail="Old password is incorrect")
     user.hashed_password = pwd_context.hash(request.new_password)
     db.commit()
     return {"message": "Password has been reset successfully."}
@@ -343,14 +346,18 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(..., example="polupoljoprivrednik")
 @router.post("/change-password/")
 async def change_password(request: ChangePasswordRequest, db: Session = Depends(get_db)):
-
-    reset_token = secrets.token_urlsafe()
+    print("Request: ", request.token)
     # Store the reset token with an expiration time
-    user = resetToken_crud.verify_reset_token(db, request.token)
-    await resetToken_crud.store_reset_token(db, user.id, reset_token)
-
+    payload = jwt.decode(request.token, SECRET_KEY, algorithms=[ALGORITHM])
+    username: str = payload.get("sub")
+    if username is None:
+        print("Username is None")
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
+    user = get_user(db, username=username)
     if not user:
         raise HTTPException(status_code=404, detail="Invalid or expired token")
+    reset_token = secrets.token_urlsafe()
+    await resetToken_crud.store_reset_token(db, user.id, reset_token)
     if not verify_password(request.old_password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Old password is incorrect")
     user.hashed_password = pwd_context.hash(request.new_password)

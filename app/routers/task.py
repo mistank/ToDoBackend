@@ -30,7 +30,7 @@ def get_db():
         db.close()
 
 @router.post("/tasks/")
-def create_task(task: schema.TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: schema.TaskBase, db: Session = Depends(get_db)):
     return crud.create_task(db=db, task=task)
 
 
