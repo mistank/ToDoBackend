@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.projectUserRole import model, schema
@@ -26,12 +28,18 @@ def create_role(db: Session, projectUserRole: schema.ProjectUserRoleBase):
 
 
 def add_user_to_project(db, project_id, user_id, role_id):
-    db_projectUserRole = model.ProjectUserRole(uid=user_id, pid=project_id, rid=role_id)
-    db.add(db_projectUserRole)
-    db.commit()
-    db.refresh(db_projectUserRole)
-    return db_projectUserRole
-
+    try:
+        db_projectUserRole = model.ProjectUserRole(uid=user_id, pid=project_id, rid=role_id)
+        db.add(db_projectUserRole)
+        db.commit()
+        db.refresh(db_projectUserRole)
+        return db_projectUserRole
+    except IntegrityError as e:
+        db.rollback()
+        error_code = e.orig.args[0]  # Extract the error code
+        #1062 is the error code for duplicate entry
+        if error_code == 1062:
+            raise HTTPException(status_code=400, detail="User already added to project")
 
 def get_user_project(uid, project_id, db):
     return db.query(ProjectUserRole).filter(ProjectUserRole.uid == uid, ProjectUserRole.pid == project_id).first()

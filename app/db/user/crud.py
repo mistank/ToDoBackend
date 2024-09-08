@@ -94,3 +94,12 @@ def create_users(db, users):
         db.commit()
         db.refresh(db_user)
     return users
+
+
+def search_users_not_from_project(db, project_id, search):
+    result = [
+        user for user in get_users_not_from_project(db, project_id)
+        if search.lower() in user.firstName.lower() or search.lower() in user.lastName.lower()
+    ]
+
+    return result

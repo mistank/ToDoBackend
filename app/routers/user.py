@@ -67,6 +67,11 @@ def get_users_for_project(project_id: int, db: Session = Depends(get_db)):
     users = crud.get_users_from_project(db, project_id)
     return users
 
+@router.get("/search-users-not-from-project/{project_id}/{search}", response_model=list[schema.User])
+def search_users_not_from_project(project_id: int, search: str, db: Session = Depends(get_db)):
+    users = crud.search_users_not_from_project(db, project_id, search)
+    return users
+
 @router.get("/users-not-from-project/{project_id}/", response_model=list[schema.User])
 def get_users_not_from_project(project_id: int, db: Session = Depends(get_db)):
     users = crud.get_users_not_from_project(db, project_id)

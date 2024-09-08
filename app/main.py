@@ -13,7 +13,10 @@ import uvicorn
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://mistank.github.io/ToDoFrontend/login",
+    "https://mistank.github.io/ToDoFrontend",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -22,35 +25,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# @app.middleware("http")
-# async def convert_dates_to_utc(request: Request, call_next):
-#     # Function to convert date strings to UTC
-#     def convert_to_utc(date_str, timezone_str):
-#         local_tz = pytz.timezone(timezone_str)
-#         local_dt = local_tz.localize(datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S"))
-#         utc_dt = local_dt.astimezone(pytz.utc)
-#         #Get the name of my timezone
-#         return utc_dt
-# # body[key] = datetime.fromisoformat(value).replace(tzinfo=pytz.utc).astimezone(pytz.timezone('Europe/Belgrade')).isoformat()
-#
-#     # Process the request body and convert date strings to UTC
-#     if request.method in ["POST", "PUT", "PATCH"]:
-#         print("Usao sam u if")
-#         body = await request.json()
-#         timezone_str = "Europe/Belgrade"  # Adjust this to your timezone
-#         for key, value in body.items():
-#             if isinstance(value, str) and "T" in value:  # Simple check for datetime strings
-#                 print("Usao sam u if 2")
-#                 print("Key: ", body[key])
-#                 try:
-#                     body[key] = convert_to_utc(value, timezone_str).isoformat()
-#                 except ValueError:
-#                     pass  # Ignore values that are not valid date strings
-#         request._body = body
-#
-#     response = await call_next(request)
-#     return response
 
 # Your existing routes and other configurations
 
