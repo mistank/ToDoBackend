@@ -131,6 +131,6 @@ def update_task_status(task_id: int, status: Status, db: Session = Depends(get_d
 @router.delete("/tasks/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     db_task = crud.delete_task(db, task_id=task_id)
-    return db_task
+    {"detail": "Task deleted successfully"}
 
 
