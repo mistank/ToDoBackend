@@ -6,6 +6,7 @@ from app.db.projectUserRole import model as projectUserRole_model
 from app.db.user import model as user_model
 from app.db.project import model as project_model
 from sqlalchemy.orm import joinedload
+from fastapi import status
 
 def get_project(db, project_id: int):
     return db.query(model.Project).filter(model.Project.id == project_id).first()
@@ -20,23 +21,42 @@ def get_owned_projects(db, owner_id: int):
 
 def create_project(db, project):
     try:
-        db_project = model.Project(name=project.name, owner=project.owner, description=project.description,
-                                   creation_date=datetime.now(), deadline=project.deadline)
+        db_project = model.Project(
+            name=project.name,
+            owner=project.owner,
+            description=project.description,
+            creation_date=datetime.now(),
+            deadline=project.deadline
+        )
         db.add(db_project)
         db.commit()
         db.refresh(db_project)
-        db_projectUserRole = projectUserRole_model.ProjectUserRole(uid=project.owner, pid=db_project.id, rid=1)
+
+        db_projectUserRole = projectUserRole_model.ProjectUserRole(
+            uid=project.owner,
+            pid=db_project.id,
+            rid=1
+        )
         db.add(db_projectUserRole)
         db.commit()
         db.refresh(db_projectUserRole)
+
         return db_project
+
     except IntegrityError as e:
         db.rollback()
-        error_code = e.orig.args[0]  # Extract the error code
-        print(type(error_code))
-        #1062 is the error code for duplicate entry
+        error_code = e.orig.args[0]
+
         if error_code == 1062:
-            raise HTTPException(status_code=400, detail="Project name already exists")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Project name already exists"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Database integrity error: {str(e)}"
+            )
 
 
 
