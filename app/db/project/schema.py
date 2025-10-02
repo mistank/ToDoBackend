@@ -16,8 +16,9 @@ class ProjectCreate(ProjectBase):
     owner: int
 
 class Project(ProjectBase):
-    id : int
-    user: User
+    id: int
+    owner: int
+    creation_date: datetime
 
     class Config:
         from_orm = True

@@ -1,19 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.db.database import SessionLocal, engine
+from app.db.database import engine
+from app.routers.authentication import get_db
 from app.db.role import model, schema
 
 model.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.get("/roles/")
 def read_roles(db: Session = Depends(get_db)):

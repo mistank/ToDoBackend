@@ -8,8 +8,8 @@ from app.db.project import model, schema, crud
 from app.db.projectUserRole import crud as projectUserRole_crud
 from app.db.projectUserRole import schema as projectUserRole_schema
 from app.db.projectUserRole import model as projectUserRole_model
-from app.db.database import SessionLocal, engine
-from app.routers.authentication import get_current_user, oauth2_scheme
+from app.db.database import engine
+from app.routers.authentication import get_current_user, oauth2_scheme, get_db
 from app.db.user import crud as user_crud
 from app.db.role import model as role_model
 
@@ -17,14 +17,6 @@ model.Base.metadata.create_all(bind=engine)
 role_model.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/projects/", response_model=schema.Project)

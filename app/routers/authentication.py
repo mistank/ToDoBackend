@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     MAIL_STARTTLS: bool = True  # Assuming STARTTLS should be enabled
     MAIL_SSL_TLS: bool = False  # Assuming SSL/TLS is not required
     sqlalchemy_database_url: str
+    sqlalchemy_test_database_url: str
 
     class Config:
         env_file = ".env"

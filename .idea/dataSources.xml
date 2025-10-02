@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:mysql://mysql-1bf5496c-bee-keeping.a.aivencloud.com:27137</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="defaultdb@mysql-1f4491a-bee-keeping.g.aivencloud.com" uuid="37767ba0-2570-4d95-b425-b6f59fae5b1e">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://mysql-1f4491a-bee-keeping.g.aivencloud.com:27137/defaultdb</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

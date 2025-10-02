@@ -1,7 +1,8 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from app.db.database import engine, SessionLocal
+from app.db.database import engine
+from app.routers.authentication import get_db
 from app.db.status.schema import Status
 from app.db.task import model, crud, schema
 from app.db.task.schema import Task
@@ -21,13 +22,6 @@ userTask_model.Base.metadata.create_all(bind=engine)
 
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/tasks/")
 def create_task(task: schema.TaskBase, db: Session = Depends(get_db)):

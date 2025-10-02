@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from app.db.database import engine, SessionLocal
+from app.db.database import engine
+from app.routers.authentication import get_db
 from app.db.projectStatus.model import ProjectStatus
 from app.db.status import schema, crud
 from app.db.projectStatus import crud as projectStatus_crud
@@ -13,13 +14,6 @@ from app.db.projectStatus import model as projectStatus_model
 router = APIRouter()
 
 projectStatus_model.Base.metadata.create_all(bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/status/{project_id}")
 def create_status(status: schema.StatusBase, project_id: int, db: Session = Depends(get_db)):
