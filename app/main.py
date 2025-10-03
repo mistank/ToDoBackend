@@ -15,13 +15,6 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
-# @app.middleware("http")
-# async def debug_cors(request: Request, call_next):
-#     print(f"\n🔵 {request.method} {request.url.path} from {request.headers.get('origin')}")
-#     response = await call_next(request)
-#     print(f"🟢 CORS header: {response.headers.get('access-control-allow-origin')}")
-#     return response
-
 @app.get("/openapi.json")
 def get_openapi_spec():
     return app.openapi()

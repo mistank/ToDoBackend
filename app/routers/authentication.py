@@ -32,16 +32,22 @@ from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
+    # Email settings
     MAIL_USERNAME: str = "milan"
     MAIL_PASSWORD: str = "Sarenileptir"
     MAIL_FROM: str = "milan.stankovic02@outlook.com"
     MAIL_PORT: int = 587
     MAIL_SERVER: str = "smtp.outlook.com"
     MAIL_FROM_NAME: str = "To Do App"
-    MAIL_STARTTLS: bool = True  # Assuming STARTTLS should be enabled
-    MAIL_SSL_TLS: bool = False  # Assuming SSL/TLS is not required
+    MAIL_STARTTLS: bool = True
+    MAIL_SSL_TLS: bool = False
+
     sqlalchemy_database_url: str
     sqlalchemy_test_database_url: str
+
+    secret_key: str = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
     class Config:
         env_file = ".env"
