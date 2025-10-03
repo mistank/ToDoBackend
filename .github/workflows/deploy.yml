@@ -31,7 +31,7 @@ jobs:
 
     - name: Deploy notification
       run: |
-        echo "🚀 Ready for deployment!"
+        echo "Ready for deployment!"
         echo "Branch/Tag: ${{ github.ref }}"
         echo "Commit: ${{ github.sha }}"
 
