@@ -15,7 +15,7 @@ def test_create_role(client, test_db):
     role_data = {
         "name": role_name
     }
-    response = client.post("/role/", json=role_data)
+    response = client.post("/roles/", json=role_data)
     assert_response(response, 200, f"Failed to create role '{role_name}'")
 
     data = response.json()

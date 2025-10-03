@@ -6,9 +6,9 @@ from app.db.role import schema, model
 from app.exceptions import handle_database_error, handle_not_found
 
 
-def create_role(db: Session, role: schema.RoleCreate):
+def create_role(db: Session, role: schema.Role):
     try:
-        db_role = model.Role(name=role.name, description=role.description)
+        db_role = model.Role(name=role.name)
         db.add(db_role)
         db.commit()
         db.refresh(db_role)
@@ -43,7 +43,6 @@ def update_role(db: Session, role: schema.Role, role_id: int):
             handle_not_found("Role", role_id)
 
         db_role.name = role.name
-        db_role.description = role.description
         db.commit()
         db.refresh(db_role)
         return db_role

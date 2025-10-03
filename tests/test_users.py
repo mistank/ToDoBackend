@@ -11,7 +11,7 @@ def test_create_user(client, test_db):
     """Test kreiranje novog korisnika"""
     uid = unique_id()
     user_data = {
-        "username": f"johndoe_{uid}",
+        "username": f"johndoe",
         "email": f"johndoe@example.com",
         "password": "password123",
         "firstName": "John",
@@ -21,8 +21,8 @@ def test_create_user(client, test_db):
     assert_response(response, 200, "Failed to create user")
 
     data = response.json()
-    assert data["username"] == f"johndoe_{uid}"
-    assert data["email"] == f"johndoe_{uid}@example.com"
+    assert data["username"] == "johndoe"
+    assert data["email"] == "johndoe@example.com"
     assert "id" in data
 
 
@@ -30,7 +30,7 @@ def test_create_user_duplicate_email(client, test_user):
     """Test kreiranje korisnika sa već postojećim emailom"""
     user_data = {
         "username": "different",
-        "email": "johndoe@example.com",
+        "email": "testuser@example.com",
         "password": "password123",
         "firstName": "John",
         "lastName": "Doe"

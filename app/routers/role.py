@@ -18,11 +18,12 @@ def read_role(role_id: int, db: Session = Depends(get_db)):
     return role
 
 @router.post("/roles/")
-def create_role(role: schema.Role, db: Session = Depends(get_db)):
-    db.add(role)
+def create_role(role: schema.RoleBase, db: Session = Depends(get_db)):
+    db_role = model.Role(name=role.name)
+    db.add(db_role)
     db.commit()
-    db.refresh(role)
-    return role
+    db.refresh(db_role)
+    return db_role
 
 @router.put("/roles/{role_id}")
 def update_role(role_id: int, role: schema.Role, db: Session = Depends(get_db)):
