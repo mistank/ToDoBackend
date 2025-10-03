@@ -13,9 +13,6 @@ from app.routers.authentication import get_current_user, oauth2_scheme, get_db
 from app.db.user import crud as user_crud
 from app.db.role import model as role_model
 
-model.Base.metadata.create_all(bind=engine)
-role_model.Base.metadata.create_all(bind=engine)
-
 router = APIRouter()
 
 

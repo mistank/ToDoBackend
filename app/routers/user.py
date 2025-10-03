@@ -5,8 +5,6 @@ from app.db.user import model, schema, crud
 from app.db.database import engine
 from app.routers.authentication import get_db
 
-model.Base.metadata.create_all(bind=engine)
-
 router = APIRouter()
 
 

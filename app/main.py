@@ -1,7 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import authentication, user, project, task, status, taskCategory, role
+from app.db.database import Base, engine
 import uvicorn
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

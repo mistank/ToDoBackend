@@ -4,8 +4,6 @@ from app.db.database import engine
 from app.routers.authentication import get_db
 from app.db.role import model, schema
 
-model.Base.metadata.create_all(bind=engine)
-
 router = APIRouter()
 
 @router.get("/roles/")

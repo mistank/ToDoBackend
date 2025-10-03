@@ -15,12 +15,6 @@ from app.db.userTask import schema as userTask_schema
 from app.db.user import crud as user_crud
 from app.db.projectUserRole import crud as projectUserRole_crud
 
-model.Base.metadata.create_all(bind=engine)
-taskCat_model.Base.metadata.create_all(bind=engine)
-status_model.Base.metadata.create_all(bind=engine)
-userTask_model.Base.metadata.create_all(bind=engine)
-
-
 router = APIRouter()
 
 @router.post("/tasks/")

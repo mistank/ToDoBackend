@@ -13,8 +13,6 @@ from app.db.projectStatus import model as projectStatus_model
 
 router = APIRouter()
 
-projectStatus_model.Base.metadata.create_all(bind=engine)
-
 @router.post("/status/{project_id}")
 def create_status(status: schema.StatusBase, project_id: int, db: Session = Depends(get_db)):
     db_status = crud.get_status_by_name(db, status.name)
