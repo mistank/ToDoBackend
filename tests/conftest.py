@@ -120,6 +120,20 @@ def test_user(client, test_db):
         test_db.commit()
         test_db.refresh(permission)
 
+    admin_role = test_db.query(Role).filter(Role.id == 1).first()
+    if not admin_role:
+        admin_role = Role(id=1, name="Admin")
+        test_db.add(admin_role)
+        test_db.commit()
+        test_db.refresh(admin_role)
+
+    member_role = test_db.query(Role).filter(Role.id == 2).first()
+    if not member_role:
+        member_role = Role(id=2, name="Member")
+        test_db.add(member_role)
+        test_db.commit()
+        test_db.refresh(member_role)
+
     hashed_password = get_password_hash("testpassword123")
     user = User(
         firstName="Test",
