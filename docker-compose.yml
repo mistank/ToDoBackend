@@ -25,7 +25,7 @@ services:
     container_name: todo_backend
     restart: always
     ports:
-      - "8000:8000"
+      - "9000:8000"
     environment:
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER:-todouser}:${MYSQL_PASSWORD:-todopassword}@db:3306/${MYSQL_DATABASE:-defaultdb}
     depends_on:
